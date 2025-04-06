@@ -1,9 +1,11 @@
 export class SinglyListNode {
     #nodeData;
-    #nextNode!;
+    #nextNode;
 
     constructor(data) {
         this.#nodeData = data;
+
+        this.#nextNode = null;
     }
 
     get data() {
@@ -20,60 +22,61 @@ export class SinglyListNode {
 }
 
 export class SinglyLinkedList {
-    headNode;
-    tailNode;
+    #headNode = null;
+    #tailNode = null;
     listLength = 0;
 
     constructor(data = null) {
         if (data === null) {
-            this.headNode = null;
-            this.tailNode = null;
+            this.#headNode = null;
+            this.#tailNode = null;
             return;
         }
 
         const newNode = new SinglyListNode(data);
-        this.headNode = newNode;
-        this.tailNode = newNode;
+        this.#headNode = newNode;
+        this.#tailNode = newNode;
+        this.listLength = 1;
     }
 
-    setInitialNode(node) {
-        this.headNode = node;
-        this.tailNode = node;
+    #setInitialNode(node) {
+        this.#headNode = node;
+        this.#tailNode = node;
     }
 
     addNode(data) {
         const newNode = new SinglyListNode(data);
         this.listLength += 1;
 
-        if (this.tailNode) {
-            this.tailNode.next = newNode;
-            this.tailNode = newNode;
+        if (this.#tailNode) {
+            this.#tailNode.next = newNode;
+            this.#tailNode = newNode;
             return;
         }
 
-        return this.setInitialNode(newNode);
+        return this.#setInitialNode(newNode);
     }
     addNodeToStart(data) {
         this.listLength += 1;
         const newNode = new SinglyListNode(data);
-        if (this.headNode) {
-            newNode.next = this.headNode;
-            this.headNode = newNode;
+        if (this.#headNode) {
+            newNode.next = this.#headNode;
+            this.#headNode = newNode;
             return;
         }
 
-        return this.setInitialNode(newNode);
+        return this.#setInitialNode(newNode);
     }
 
     searchForData(searchData) {
-        if (this.headNode) {
-            if (this.headNode.data === searchData) {
+        if (this.#headNode) {
+            if (this.#headNode.data === searchData) {
                 return true;
-            } else if (this.headNode !== this.tailNode && this.tailNode?.data === searchData) {
+            } else if (this.#headNode !== this.#tailNode && this.#tailNode?.data === searchData) {
                 return true;
             }
 
-            let currentNode = this.headNode.next;
+            let currentNode = this.#headNode.next;
 
             while (currentNode !== null) {
                 if (currentNode.data === searchData) {
@@ -81,7 +84,7 @@ export class SinglyLinkedList {
                 }
 
                 currentNode = currentNode.next;
-                if (currentNode === this.tailNode) {
+                if (currentNode === this.#tailNode) {
                     break;
                 }
             }
@@ -91,42 +94,34 @@ export class SinglyLinkedList {
     }
 
     getFirstNode() {
-        return this.headNode === null ? null : this.headNode.data;
+        return this.#headNode === null ? null : this.#headNode.data;
     }
 
     getLastNode() {
-        return this.tailNode === null ? null : this.tailNode.data;
+        return this.#tailNode === null ? null : this.#tailNode.data;
     }
 
     getNodeInPosition(positionToFind) {
-        if (!this.headNode) return null;
+        if (!this.#headNode) return null;
         if (positionToFind < 1) return null;
         if (this.listLength < positionToFind) return null;
 
-        if (positionToFind === 1) return this.headNode;
+        if (positionToFind === 1) return this.#headNode.data;
+        if (positionToFind === this.listLength) return this.#tailNode?.data;
 
-        let element = this.headNode.next;
-        for (let i = 2; i <= positionToFind; i++) {
+        let element = this.#headNode.next;
+        for (let i = 3; i <= positionToFind; i++) {
             element = element?.next || null;
         }
 
         return element?.data || null;
     }
 
-    /**
-     * implement getNodeInPosition
-     * 1. It will take in input parameter of position (which will be 1 more than the index)
-     * 2. if 1, then display the first node
-     * 3. Iterate through the nodes starting at 0 till the count is position - 1
-     * 4. Then display the current data
-     * 5. If current.next is null before reaching position - 1, then display index out of bounds error
-     */
-
     deleteFirstNode() {
-        if (this.headNode) {
-            const headNode = this.headNode;
+        if (this.#headNode) {
+            const headNode = this.#headNode;
 
-            this.headNode = headNode.next;
+            this.#headNode = headNode.next;
             headNode.next = null;
 
             this.listLength -= 1;
@@ -138,17 +133,18 @@ export class SinglyLinkedList {
     }
 
     deleteLastNode() {
-        if (this.headNode === this.tailNode) {
+        if (this.#headNode === this.#tailNode) {
             return this.deleteFirstNode();
         }
 
-        let currentNode = this.headNode;
+        let currentNode = this.#headNode;
 
         while (currentNode.next?.next) {
             currentNode = currentNode.next;
         }
 
         currentNode.next = null;
+        this.#tailNode = currentNode;
 
         this.listLength -= 1;
 
@@ -156,24 +152,19 @@ export class SinglyLinkedList {
     }
 
     deleteNodeInPosition(positionToDelete) {
-        if (!this.headNode) return false;
+        if (!this.#headNode) return false;
         if (positionToDelete < 1) return false;
         if (this.listLength < positionToDelete) return false;
 
         if (positionToDelete === 1) {
-            const currElement = this.headNode;
-
-            this.headNode = currElement.next;
-            currElement.next = null;
-
-            this.listLength = this.listLength - 1;
-
-            return true
+            return this.deleteFirstNode()
+        } else if (positionToDelete === this.listLength) {
+            return this.deleteLastNode();
         };
 
-        let element = this.headNode;
+        let element = this.#headNode;
         for (let i = 2; i < positionToDelete; i++) {
-            element = element?.next || null;
+            element = element?.next ?? null;
 
             if (element === null) break;
         }
@@ -185,6 +176,8 @@ export class SinglyLinkedList {
             element.next = deletedElement.next;
             deletedElement.next = null;
 
+            if (element.next === null) this.#tailNode = element;
+
             this.listLength = this.listLength - 1;
 
         } else return false;
@@ -192,30 +185,23 @@ export class SinglyLinkedList {
         return true;
     }
 
-    /**
-     * implement deleteNodeInPosition
-     * 1. It will take in input parameter of position (which will be 1 more than the index)
-     * 2. if 1, then delete the first node
-     * 3. If 2, then set headNode to next.next
-     * 4. Iterate through the nodes starting at 0 till the count is position - 2
-     * 5. Save the currentNode.next in nodeToDelete variable
-     * 6. Set currentNode.next = currentNode.next.next
-     * 7. Set nodeToDelete.next to null, to avoid situations where if this node is cached then it gives access to further nodes
-     */
-
     deleteNodeWithData(searchData) {
-        if (this.headNode) {
-            if (this.headNode.data === searchData) {
+        if (this.#headNode) {
+            if (this.#headNode.data === searchData) {
                 return this.deleteFirstNode();
             }
 
-            let currentNode = this.headNode.next;
+            let currentNode = this.#headNode.next;
 
             while (currentNode !== null) {
-                if (currentNode.data === searchData) {
-                    const nodeToDelete = currentNode;
+                if (currentNode.next?.data === searchData) {
+                    const nodeToDelete = currentNode.next;
 
-                    currentNode = nodeToDelete.next;
+                    currentNode.next = nodeToDelete?.next ?? null;
+                    if (currentNode.next === null) {
+                        this.#tailNode = currentNode;
+                    }
+
                     nodeToDelete.next = null;
 
                     this.listLength -= 1;
@@ -233,12 +219,12 @@ export class SinglyLinkedList {
     displayList() {
         let displayString = '';
 
-        if (this.headNode === null) {
+        if (this.#headNode === null) {
             console.log('The list is empty');
             return;
         }
 
-        let currentNode = this.headNode;
+        let currentNode = this.#headNode;
 
         while (currentNode !== null) {
             displayString += currentNode.data;
@@ -248,5 +234,40 @@ export class SinglyLinkedList {
                 displayString += '-->'
             }
         }
+
+        return displayString;
     }
 }
+
+const newList = new SinglyLinkedList(2);
+
+newList.addNodeToStart(1);
+newList.addNode(3);
+newList.addNode(4);
+newList.addNode(5);
+newList.addNode(6);
+newList.addNode(7);
+newList.addNode(8);
+newList.addNode(9);
+newList.addNode(10);
+
+newList.deleteNodeWithData(8);
+console.log(newList.displayList());
+
+newList.deleteNodeInPosition(8);
+console.log(newList.displayList());
+
+newList.deleteLastNode();
+console.log(newList.displayList());
+
+newList.deleteFirstNode();
+console.log(newList.displayList());
+
+newList.addNodeToStart(1);
+console.log(newList.displayList());
+
+console.log(newList.getFirstNode());
+console.log(newList.getLastNode());
+console.log(newList.getNodeInPosition(2));
+console.log(newList.searchForData(4));
+

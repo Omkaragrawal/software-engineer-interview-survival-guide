@@ -1,9 +1,11 @@
 export class SinglyListNode {
     private nodeData: unknown;
-    private nextNode!: SinglyListNode | null;
+    private nextNode: SinglyListNode | null;
 
     constructor(data: unknown) {
         this.nodeData = data;
+
+        this.nextNode = null;
     }
 
     public get data(): unknown {
@@ -22,7 +24,7 @@ export class SinglyListNode {
 export class SinglyLinkedList {
     private headNode: SinglyListNode | null;
     private tailNode: SinglyListNode | null;
-    private listLength = 0;
+    public listLength = 0;
 
     constructor(data: unknown = null) {
         if (data === null) {
@@ -34,6 +36,8 @@ export class SinglyLinkedList {
         const newNode = new SinglyListNode(data);
         this.headNode = newNode;
         this.tailNode = newNode;
+
+        this.listLength = 1;
     }
 
     private setInitialNode(node: SinglyListNode) {
@@ -103,24 +107,16 @@ export class SinglyLinkedList {
         if (positionToFind < 1) return null;
         if (this.listLength < positionToFind) return null;
 
-        if (positionToFind === 1) return this.headNode;
+        if (positionToFind === 1) return this.headNode.data;
+        if (positionToFind === this.listLength) return this.tailNode?.data;
 
         let element = this.headNode.next;
         for (let i = 2; i <= positionToFind; i++) {
-            element = element?.next || null;
+            element = element?.next ?? null;
         }
 
         return element?.data || null;
     }
-
-    /**
-     * implement getNodeInPosition
-     * 1. It will take in input parameter of position (which will be 1 more than the index)
-     * 2. if 1, then display the first node
-     * 3. Iterate through the nodes starting at 0 till the count is position - 1
-     * 4. Then display the current data
-     * 5. If current.next is null before reaching position - 1, then display index out of bounds error
-     */
 
     public deleteFirstNode(): boolean {
         if (this.headNode) {
@@ -149,31 +145,27 @@ export class SinglyLinkedList {
         }
 
         currentNode.next = null;
+        this.tailNode = currentNode;
 
         this.listLength -= 1;
 
         return false;
     }
 
-    public deleteNodeInPosition(positionToDelete: number): boolean {
+    deleteNodeInPosition(positionToDelete) {
         if (!this.headNode) return false;
         if (positionToDelete < 1) return false;
         if (this.listLength < positionToDelete) return false;
 
         if (positionToDelete === 1) {
-            const currElement = this.headNode;
-
-            this.headNode = currElement.next;
-            currElement.next = null;
-
-            this.listLength = this.listLength - 1;
-
-            return true
+            return this.deleteFirstNode()
+        } else if (positionToDelete === this.listLength) {
+            return this.deleteLastNode();
         };
 
         let element: SinglyListNode | null = this.headNode;
         for (let i = 2; i < positionToDelete; i++) {
-            element = element?.next || null;
+            element = element?.next ?? null;
 
             if (element === null) break;
         }
@@ -185,23 +177,14 @@ export class SinglyLinkedList {
             element.next = deletedElement.next;
             deletedElement.next = null;
 
+            if (element.next === null) this.tailNode = element;
+
             this.listLength = this.listLength - 1;
 
         } else return false;
 
         return true;
     }
-
-    /**
-     * implement deleteNodeInPosition
-     * 1. It will take in input parameter of position (which will be 1 more than the index)
-     * 2. if 1, then delete the first node
-     * 3. If 2, then set headNode to next.next
-     * 4. Iterate through the nodes starting at 0 till the count is position - 2
-     * 5. Save the currentNode.next in nodeToDelete variable
-     * 6. Set currentNode.next = currentNode.next.next
-     * 7. Set nodeToDelete.next to null, to avoid situations where if this node is cached then it gives access to further nodes
-     */
 
     public deleteNodeWithData(searchData: unknown): boolean {
         if (this.headNode) {
@@ -212,11 +195,15 @@ export class SinglyLinkedList {
             let currentNode = this.headNode.next;
 
             while (currentNode !== null) {
-                if (currentNode.data === searchData) {
-                    const nodeToDelete = currentNode;
+                if (currentNode.next?.data === searchData) {
+                    const nodeToDelete = currentNode.next;
 
-                    currentNode = nodeToDelete.next;
-                    nodeToDelete.next = null;
+                    currentNode.next = nodeToDelete?.next ?? null;
+                    if (currentNode.next === null) {
+                        this.tailNode = currentNode;
+                    }
+
+                    (nodeToDelete as SinglyListNode).next = null;
 
                     this.listLength -= 1;
 
@@ -230,12 +217,12 @@ export class SinglyLinkedList {
         return false;
     }
 
-    public displayList(): void {
+    public displayList(): string {
         let displayString = '';
 
         if (this.headNode === null) {
             console.log('The list is empty');
-            return;
+            return '';
         }
 
         let currentNode: SinglyListNode | null = this.headNode;
@@ -248,5 +235,39 @@ export class SinglyLinkedList {
                 displayString += '-->'
             }
         }
+
+        return displayString;
     }
 }
+
+const newList = new SinglyLinkedList(2);
+
+newList.addNodeToStart(1);
+newList.addNode(3);
+newList.addNode(4);
+newList.addNode(5);
+newList.addNode(6);
+newList.addNode(7);
+newList.addNode(8);
+newList.addNode(9);
+newList.addNode(10);
+
+newList.deleteNodeWithData(8);
+console.log(newList.displayList());
+
+newList.deleteNodeInPosition(8);
+console.log(newList.displayList());
+
+newList.deleteLastNode();
+console.log(newList.displayList());
+
+newList.deleteFirstNode();
+console.log(newList.displayList());
+
+newList.addNodeToStart(1);
+console.log(newList.displayList());
+
+console.log(newList.getFirstNode());
+console.log(newList.getLastNode());
+console.log(newList.getNodeInPosition(2));
+console.log(newList.searchForData(4));
