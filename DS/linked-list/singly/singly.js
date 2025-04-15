@@ -124,6 +124,10 @@ export class SinglyLinkedList {
             this.#headNode = headNode.next;
             headNode.next = null;
 
+            if (this.headNode === null) {
+                this.tailNode = null;
+            }
+
             this.listLength -= 1;
 
             return true;

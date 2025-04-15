@@ -125,6 +125,10 @@ export class SinglyLinkedList {
             this.headNode = headNode.next;
             headNode.next = null;
 
+            if (this.headNode === null) {
+                this.tailNode = null;
+            }
+
             this.listLength -= 1;
 
             return true;
@@ -152,7 +156,7 @@ export class SinglyLinkedList {
         return false;
     }
 
-    deleteNodeInPosition(positionToDelete) {
+    public deleteNodeInPosition(positionToDelete) {
         if (!this.headNode) return false;
         if (positionToDelete < 1) return false;
         if (this.listLength < positionToDelete) return false;
@@ -188,9 +192,8 @@ export class SinglyLinkedList {
 
     public deleteNodeWithData(searchData: unknown): boolean {
         if (this.headNode) {
-            if (this.headNode.data === searchData) {
-                return this.deleteFirstNode();
-            }
+            if (this.headNode?.data === searchData) return this.deleteFirstNode();
+            if (this.tailNode?.data === searchData) return this.deleteLastNode();
 
             let currentNode = this.headNode.next;
 
