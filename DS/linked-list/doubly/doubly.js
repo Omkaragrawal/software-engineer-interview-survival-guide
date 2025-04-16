@@ -265,6 +265,7 @@ export class DoublyLinkedList {
     }
 }
 
+export default DoublyLinkedList;
 
 const newList = new DoublyLinkedList(2);
 

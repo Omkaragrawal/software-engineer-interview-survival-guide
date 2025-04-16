@@ -243,6 +243,8 @@ export class SinglyLinkedList {
     }
 }
 
+export default SinglyLinkedList;
+
 const newList = new SinglyLinkedList(2);
 
 newList.addNodeToStart(1);
