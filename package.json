@@ -1,0 +1,24 @@
+{
+  "name": "interview-survival",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Omkaragrawal/software-engineer-interview-survival-guide.git"
+  },
+  "keywords": [],
+  "author": "OMKAR AGRAWAL",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/Omkaragrawal/software-engineer-interview-survival-guide/issues"
+  },
+  "homepage": "https://github.com/Omkaragrawal/software-engineer-interview-survival-guide#readme",
+  "description": "",
+  "type": "module",
+  "imports": {
+    "#linked-list/*": "./DS/linked-list/*.js"
+  }
+}
